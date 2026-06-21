@@ -1,8 +1,6 @@
 <div align="center">
 
-  <h1>
-    <span>Notify</span><span style="color:#E11D48">flow</span>
-  </h1>
+  <img src="assets/logo.png" alt="Notifyflow Logo" width="260" />
 
   <p>Multi-channel notification delivery infrastructure for developers</p>
 
