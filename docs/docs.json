@@ -56,18 +56,18 @@
     "links": [
       {
         "label": "Dashboard",
-        "href": "https://notifyflow.dev/dashboard"
+        "href": "https://notifyflow-dashboard.vercel.app/dashboard"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Get Started",
-      "href": "https://notifyflow.dev/auth/signup"
+      "href": "https://notifyflow-dashboard.vercel.app/auth/signup"
     }
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/yourusername/notifyflow"
+      "github": "https://github.com/soham1826/Notifyflow"
     }
   }
 }

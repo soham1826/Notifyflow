@@ -7,7 +7,7 @@ Follow this guide to sign up, configure a channel provider, design a template, a
 
 <Steps>
   <Step title="Create your Account">
-    Sign up on the [Notifyflow Dashboard](https://notifyflow.dev/auth/signup) to create a tenant profile. Your new profile automatically initializes with a unique public API key.
+    Sign up on the [Notifyflow Dashboard](https://notifyflow-dashboard.vercel.app/auth/signup) to create a tenant profile. Your new profile automatically initializes with a unique public API key.
   </Step>
   
   <Step title="Configure your Resend API Key">
@@ -30,7 +30,7 @@ Follow this guide to sign up, configure a channel provider, design a template, a
     Use the cURL snippet below to trigger a post request, replacing `nf_live_xxxxxxxxxxxx` with your public API key (available in **Settings**):
 
     ```bash
-    curl -X POST https://api.notifyflow.dev/v1/notify \
+    curl -X POST https://notifyflow-api.onrender.com/v1/notify \
       -H "Content-Type: application/json" \
       -H "x-api-key: nf_live_9a7b3c2d1e0f8c7b" \
       -d '{

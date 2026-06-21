@@ -30,9 +30,9 @@ export default function Footer() {
             <h4 className="font-bold text-[#1C1917] uppercase tracking-wider text-[10px]">Product</h4>
             <ul className="space-y-2">
               <li><Link href="/auth/login" className="hover:text-[#E11D48] transition-colors">Dashboard</Link></li>
-              <li><a href={process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001"} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">Docs</a></li>
+              <li><a href={process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app"} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">Docs</a></li>
               <li><span className="hover:text-[#E11D48] transition-colors cursor-pointer">Changelog</span></li>
-              <li><a href="https://github.com/yourusername/notifyflow" target="_blank" rel="noreferrer" className="hover:text-[#E11D48] transition-colors">GitHub</a></li>
+              <li><a href="https://github.com/soham1826/Notifyflow" target="_blank" rel="noreferrer" className="hover:text-[#E11D48] transition-colors">GitHub</a></li>
             </ul>
           </div>
 
@@ -51,9 +51,9 @@ export default function Footer() {
           <div className="space-y-3">
             <h4 className="font-bold text-[#1C1917] uppercase tracking-wider text-[10px]">Developer</h4>
             <ul className="space-y-2">
-              <li><a href={`${process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001"}/api-reference/authentication`} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">API Reference</a></li>
-              <li><a href={`${process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001"}/quickstart`} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">Quickstart</a></li>
-              <li><a href={`${process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001"}/concepts`} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">Concepts</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app"}/api-reference/authentication`} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">API Reference</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app"}/quickstart`} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">Quickstart</a></li>
+              <li><a href={`${process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app"}/concepts`} target="_blank" rel="noopener noreferrer" className="hover:text-[#E11D48] transition-colors">Concepts</a></li>
               <li><span className="hover:text-[#E11D48] transition-colors cursor-pointer">Status</span></li>
             </ul>
           </div>
@@ -65,7 +65,7 @@ export default function Footer() {
             &copy; 2026 Notifyflow. Open source and free to use.
           </span>
           <a
-            href="https://github.com/yourusername/notifyflow"
+            href="https://github.com/soham1826/Notifyflow"
             target="_blank"
             rel="noreferrer"
             className="text-[#78716C] hover:text-[#1C1917] transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center sm:justify-end"

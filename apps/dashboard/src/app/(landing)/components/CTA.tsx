@@ -23,7 +23,7 @@ export default function CTA() {
             Get Started Free
           </Link>
           <a
-            href={process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001"}
+            href={process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app"}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto rounded-lg border border-[#F1EDE9] bg-white hover:bg-[#FAF9F7] text-[#1C1917] px-6 py-3 text-sm font-semibold transition-colors outline-none min-h-[44px] flex items-center justify-center shadow-sm"

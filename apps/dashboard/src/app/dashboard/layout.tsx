@@ -141,7 +141,7 @@ export default function DashboardLayout({
     },
     {
       name: "Developer Docs",
-      href: process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001",
+      href: process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app",
       icon: BookOpen,
       external: true,
     },

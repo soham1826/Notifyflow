@@ -44,7 +44,7 @@ export default function Navbar() {
             <a href="#how-it-works" className="hover:text-[#E11D48] transition-colors">How it Works</a>
             <a href="#code" className="hover:text-[#E11D48] transition-colors">Code</a>
             <a
-              href={process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001"}
+              href={process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app"}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-[#E11D48] transition-colors"
@@ -52,7 +52,7 @@ export default function Navbar() {
               Docs
             </a>
             <a
-              href="https://github.com/yourusername/notifyflow"
+              href="https://github.com/soham1826/Notifyflow"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 hover:text-[#E11D48] transition-colors"
@@ -139,7 +139,7 @@ export default function Navbar() {
               Code
             </a>
             <a
-              href={process.env.NEXT_PUBLIC_DOCS_URL || "http://localhost:3001"}
+              href={process.env.NEXT_PUBLIC_DOCS_URL || "https://notifyflow.mintlify.app"}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsMobileOpen(false)}
@@ -148,7 +148,7 @@ export default function Navbar() {
               Docs
             </a>
             <a
-              href="https://github.com/yourusername/notifyflow"
+              href="https://github.com/soham1826/Notifyflow"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 hover:text-[#E11D48] py-2 transition-colors"

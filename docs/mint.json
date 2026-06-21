@@ -11,11 +11,11 @@
     "dark": "#BE123C"
   },
   "topbarLinks": [
-    { "name": "Dashboard", "url": "https://notifyflow.dev/dashboard" }
+    { "name": "Dashboard", "url": "https://notifyflow-dashboard.vercel.app/dashboard" }
   ],
   "topbarCtaButton": {
     "name": "Get Started",
-    "url": "https://notifyflow.dev/auth/signup"
+    "url": "https://notifyflow-dashboard.vercel.app/auth/signup"
   },
   "navigation": [
     {
@@ -56,6 +56,6 @@
     }
   ],
   "footerSocials": {
-    "github": "https://github.com/yourusername/notifyflow"
+    "github": "https://github.com/soham1826/Notifyflow"
   }
 }
