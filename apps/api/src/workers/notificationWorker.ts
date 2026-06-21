@@ -1,10 +1,10 @@
-import { Job } from "bullmq";
+import { Job, Worker } from "bullmq";
 import { prisma, Channel, Priority, NotificationStatus, AttemptStatus } from "@notifyflow/db";
 import { NotificationJob } from "../queues/notificationQueue.js";
 import { interpolate } from "../utils/template.js";
 import { NotificationChannel, SendResult } from "../channels/channel.js";
 import { resolveChannel, NoProviderConfiguredError } from "../channels/index.js";
-import { redisConnection } from "../queues/connection.js";
+import { redisConnection, redisConnectionOptions } from "../queues/connection.js";
 
 /**
  * Processor configurations for workers
@@ -177,5 +177,86 @@ export async function notificationProcessor(job: Job<NotificationJob, any, strin
 
     // Rethrow error so BullMQ can handle retry schedules and backoffs
     throw error;
+  }
+}
+
+let activeWorkers: any[] = [];
+
+/**
+ * Initializes and starts all BullMQ workers inside the API process.
+ */
+export function initializeWorkers(): void {
+  console.log("[API Process] Initializing BullMQ Workers...");
+
+  const highWorker = new Worker("high", notificationProcessor, {
+    connection: redisConnectionOptions,
+    prefix: "notifications",
+    concurrency: workerConfigs.high.concurrency,
+  });
+
+  const defaultWorker = new Worker("default", notificationProcessor, {
+    connection: redisConnectionOptions,
+    prefix: "notifications",
+    concurrency: workerConfigs.default.concurrency,
+  });
+
+  const bulkWorker = new Worker("bulk", notificationProcessor, {
+    connection: redisConnectionOptions,
+    prefix: "notifications",
+    concurrency: workerConfigs.bulk.concurrency,
+  });
+
+  const workersList = [
+    { name: "high", instance: highWorker },
+    { name: "default", instance: defaultWorker },
+    { name: "bulk", instance: bulkWorker }
+  ];
+
+  workersList.forEach(({ name, instance }) => {
+    instance.on("ready", () => {
+      console.log(`[API Process] Worker for queue '${name}' is ready.`);
+    });
+
+    instance.on("active", (job) => {
+      console.log(`[API Process] Worker '${name}' is processing job ${job.id}`);
+    });
+
+    instance.on("completed", (job) => {
+      console.log(`[API Process] Worker '${name}' completed job ${job.id}`);
+    });
+
+    instance.on("failed", (job, err) => {
+      const jobId = job ? job.id : "unknown";
+      const attemptsMade = job ? job.attemptsMade : 0;
+      const maxAttempts = job?.opts?.attempts || 4;
+
+      if (attemptsMade >= maxAttempts) {
+        console.error(
+          `[API Process] [CRITICAL] Job ${jobId} on queue '${name}' permanently FAILED after all ${attemptsMade} attempts (Dead-Letter). Reason: ${err.message}`
+        );
+      } else {
+        console.warn(
+          `[API Process] Job ${jobId} on queue '${name}' failed attempt ${attemptsMade} of ${maxAttempts}. Will retry. Reason: ${err.message}`
+        );
+      }
+    });
+
+    instance.on("error", (error) => {
+      console.error(`[API Process] Error in worker '${name}':`, error);
+    });
+  });
+
+  activeWorkers = workersList;
+  console.log("[API Process] All priority workers successfully initialized and running inside API process.");
+}
+
+/**
+ * Gracefully shuts down the active workers.
+ */
+export async function shutdownWorkers(): Promise<void> {
+  if (activeWorkers.length > 0) {
+    console.log("[API Process] Shutting down workers gracefully...");
+    await Promise.all(activeWorkers.map(({ instance }) => instance.close()));
+    console.log("[API Process] Workers closed.");
   }
 }

@@ -114,6 +114,26 @@ async function startServer() {
     // Initialize shared Redis subscriber for SSE stream
     initializeSubscriber();
   });
+
+  // Start workers in the same process
+  try {
+    const { initializeWorkers, shutdownWorkers } = await import("./src/workers/notificationWorker.js");
+    initializeWorkers();
+
+    // Register graceful shutdown hooks
+    process.on("SIGTERM", async () => {
+      console.log("[API] SIGTERM received. Graceful shutdown...");
+      await shutdownWorkers();
+      process.exit(0);
+    });
+    process.on("SIGINT", async () => {
+      console.log("[API] SIGINT received. Graceful shutdown...");
+      await shutdownWorkers();
+      process.exit(0);
+    });
+  } catch (err) {
+    console.error("[API] Failed to initialize BullMQ workers in API process:", err);
+  }
 }
 
 startServer();
