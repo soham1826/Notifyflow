@@ -1,34 +1,61 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
 
-export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+export async function GET(request: NextRequest) {
+  const { searchParams, origin } = new URL(request.url)
+  const code = searchParams.get('code')
+  const next = searchParams.get('next') ?? '/dashboard'
 
-  if (code) {
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    
-    if (!error && data?.session) {
-      // Call Express backend to ensure the tenant record is provisioned
-      const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
-      try {
-        await fetch(`${apiBaseUrl}/api/v1/auth/provision-tenant`, {
-          method: "POST",
+  if (!code) {
+    console.error('[Callback] No code received')
+    return NextResponse.redirect(`${origin}/auth/login?error=no_code`)
+  }
+
+  const cookieStore = await cookies()
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+
+  if (error) {
+    console.error('[Callback] Exchange error:', error.message)
+    return NextResponse.redirect(
+      `${origin}/auth/login?error=${encodeURIComponent(error.message)}`
+    )
+  }
+
+  if (data.session) {
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/provision-tenant`,
+        {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             Authorization: `Bearer ${data.session.access_token}`,
           },
-        });
-      } catch (err) {
-        console.error("Failed to provision tenant during OAuth callback:", err);
-      }
-      
-      // Redirect to next path (typically /dashboard)
-      return NextResponse.redirect(`${origin}${next}`);
+        }
+      )
+    } catch (err) {
+      console.error('[Callback] Provision tenant failed:', err)
     }
   }
 
-  return NextResponse.redirect(`${origin}/auth/login?error=OAuth code exchange failed`);
+  return NextResponse.redirect(`${origin}${next}`)
 }
