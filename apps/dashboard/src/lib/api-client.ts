@@ -1,7 +1,7 @@
 import { createClient } from "./supabase/client";
 
 const supabase = createClient();
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5001";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL || ""
 
 async function request(endpoint: string, options: RequestInit = {}) {
   // Retrieve token dynamically from active Supabase session
