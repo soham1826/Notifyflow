@@ -1,0 +1,73 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Notifyflow",
+  "colors": {
+    "primary": "#E11D48",
+    "light": "#FB7185",
+    "dark": "#BE123C"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting Started",
+        "pages": [
+          "introduction",
+          "quickstart",
+          "concepts"
+        ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api-reference/authentication",
+          "api-reference/send-notification",
+          "api-reference/templates",
+          "api-reference/providers",
+          "api-reference/inapp"
+        ]
+      },
+      {
+        "group": "Channels",
+        "pages": [
+          "channels/email",
+          "channels/webhook",
+          "channels/inapp",
+          "channels/sms"
+        ]
+      },
+      {
+        "group": "Dashboard",
+        "pages": [
+          "dashboard/overview",
+          "dashboard/dead-letter-queue",
+          "dashboard/templates",
+          "dashboard/providers"
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Dashboard",
+        "href": "https://notifyflow.dev/dashboard"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Get Started",
+      "href": "https://notifyflow.dev/auth/signup"
+    }
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/yourusername/notifyflow"
+    }
+  }
+}

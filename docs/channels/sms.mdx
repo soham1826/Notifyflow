@@ -1,0 +1,26 @@
+---
+title: "SMS Channel"
+description: "Send text message alerts and OTP codes"
+---
+
+The `SMS` channel transmits text messages to mobile devices. 
+
+## Mock Gateway (Development)
+By default, the SMS channel runs in a **Mock Simulator** mode during local development. When a notification is dispatched with `channel: "SMS"`, the worker logs the message text and records a successful delivery attempt immediately. This prevents unnecessary carrier fees while testing integration flows.
+
+---
+
+## Twilio Gateway (Production)
+In production, you can select the Twilio provider to deliver text messages over real carriers.
+
+### What the interface looks like
+Under **Providers** in the dashboard, configure the following keys:
+* **Account SID:** Set as your provider username.
+* **Auth Token:** Configured as the secure API key.
+* **From Number:** The Twilio phone number (+1...) authorized to send SMS.
+
+---
+
+## SMS Payload requirements
+* **Recipient Format:** The recipient field must contain a valid phone number in international E.164 format (e.g. `+15555555555`).
+* **Content Limits:** Avoid exceeding **160 characters** in your message body to prevent carriers from splitting your text into multiple billable segments.

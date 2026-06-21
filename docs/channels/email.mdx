@@ -1,0 +1,39 @@
+---
+title: "Email Channel"
+description: "Send emails using Resend and track delivery rates"
+---
+
+The `EMAIL` channel routes transactional email dispatches to Resend using your encrypted tenant credentials.
+
+## Resend Gateway Configuration
+Email configurations require two pieces of data in the Providers tab:
+* **API Key:** A secret token generated under your Resend account.
+* **Metadata Config:**
+  * `fromEmail`: The email address showing in the recipient's "From" field (e.g. `support@yourdomain.com`).
+  * `fromName`: The human-readable name showing in the recipient's "From" field (e.g. `Acme Support`).
+
+---
+
+## Sandbox Mode Restrictions
+If you sign up for a free Resend account and choose not to verify a domain immediately, your account operates in a **Sandbox Mode** under these strict limitations:
+* **Sender Address:** Locked to `onboarding@resend.dev`. You cannot send emails from custom addresses.
+* **Recipient Domain:** You can **only** deliver emails to the specific email address that signed up for the Resend account. Any other target address yields a rejection error.
+
+To deliver notifications to arbitrary customer inbox addresses, you must verify your custom domain:
+
+<Steps>
+  <Step title="Verify custom domain in Resend">
+    Go to Resend -> **Domains** -> **Add Domain** and follow the instructions to publish DNS records.
+  </Step>
+  <Step title="Update Provider on Notifyflow">
+    Update your `fromEmail` config in the Provider Modal to use your verified domain address (e.g. `no-reply@yourdomain.com`).
+  </Step>
+</Steps>
+
+---
+
+## Delivery Attempts and Errors
+The worker records all delivery metadata in the `delivery_attempts` table. If Resend rejects the API call, the error message is stored and visible inside the **Notifications** logs. Common failure reasons include:
+* `401 Unauthorized`: Your API Key is invalid or has expired/been rotated on Resend.
+* `422 Unprocessable Entity`: The recipient address has bounced repeatedly or is on Resend's suppressions list.
+* `422 validation`: The sender email domain is not verified.

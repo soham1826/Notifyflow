@@ -1,0 +1,33 @@
+---
+title: "Concepts"
+description: "Understand the core architecture and components of Notifyflow"
+---
+
+Familiarize yourself with the key objects and architectural building blocks that make up Notifyflow.
+
+### Tenants
+A tenant represents an isolated account workspace. Each tenant has their own configurations, provider API credentials, template databases, and independent delivery queues. All data resides in secure, isolated database models mapping to a unique tenant ID.
+
+### API Keys
+Authentication to the public ingestion endpoint (`POST /v1/notify`) uses the `x-api-key` header containing your public API key. This key is generated upon signup and can be regenerated at any time from the Settings dashboard page. Keep this key secure as it grants access to dispatch notifications under your tenant context.
+
+### Channels
+Notifyflow supports multiple delivery channels: `EMAIL`, `WEBHOOK`, `IN_APP`, and `SMS`. Each channel has its own resolver logic, payload structure requirements, and retry specifications. You can mix and match channels in your templates or request dispatches for a specific channel.
+
+### Templates
+Templates allow you to separate message structure and copy from code. You define templates with dynamic placeholders like `{{ variable_name }}`, which Notifyflow interpolates at runtime using the `data` object sent in your dispatch requests.
+
+### Priority Queues
+Notifyflow features high-performance priority queues backed by BullMQ:
+* **HIGH:** Time-sensitive alerts like OTPs and verification codes bypass standard traffic.
+* **DEFAULT:** Regular transactional alerts (e.g. invoices, shipping updates) run under standard priority.
+* **BULK:** Marketing and newsletters process behind transaction alerts to prevent queue congestion.
+
+### Retry Logic
+Every delivery failure undergoes an intelligent, automatic retry pipeline. Notifyflow will attempt delivery up to **4 times** with increasing delays (exponential backoff). This guards against temporary recipient server issues or minor provider outages.
+
+### Dead-Letter Queue (DLQ)
+When a notification exhausts all 4 retry attempts without success, it is moved to the **Dead-Letter Queue (DLQ)**. The DLQ stores the message along with its final error reason. You can inspect failures and manually trigger a re-queue retry from the dashboard.
+
+### BYOK Providers
+Instead of hosting or charging for delivery gateways, Notifyflow adopts a **Bring Your Own Keys (BYOK)** model. You encrypt and store Resend or Twilio credentials directly in the dashboard, giving you complete ownership over vendor agreements and sending reputations.

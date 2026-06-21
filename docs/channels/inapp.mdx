@@ -1,0 +1,37 @@
+---
+title: "In-App Channel"
+description: "Display persistent alerts to users inside your platform"
+---
+
+The `IN_APP` channel stores notification payloads in the database instead of dispatching to external carriers. This gives you a fast, reliable mechanism for populating user-facing activity feeds.
+
+## Reading and Marking Feeds
+Applications read from and update the state of the `inapp_notifications` table:
+* **Polling:** Query unread items on a periodic loop (e.g. every 15s) from your web components.
+* **Server-Sent Events (SSE):** Establish persistent socket-like streaming channels to display instant feed increments without polling.
+
+---
+
+## Database Schema Structure
+The underlying table layout is defined in `schema.prisma`:
+
+```prisma
+model InAppNotification {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  recipientId String   @map("recipient_id")
+  title       String
+  body        String   @db.Text
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  readAt      DateTime? @map("read_at")
+}
+```
+
+---
+
+## Building a Notification UI
+For a premium user experience, follow these design guidelines in your client-side implementation:
+1. **Badges:** Use a badge (e.g. rose-600 background) displaying the unread notification count on top of a Bell icon.
+2. **Smooth Dismissal:** Trigger a fast optimistic UI update, hiding the dismissed element instantly while launching the mark-as-read `POST` call in the background.
+3. **Empty States:** Render a clean illustration and description (e.g., "All caught up!") when there are no unread notifications.

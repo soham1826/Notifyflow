@@ -1,0 +1,83 @@
+---
+title: "Send Notification"
+description: "Ingest a new notification into the delivery queue"
+---
+
+The primary API entry point to trigger dispatches across all active channels.
+
+## HTTP Endpoint
+`POST /api/v1/notify`
+
+## Headers
+| Header | Value | Description |
+|---|---|---|
+| `x-api-key` | `nf_live_...` | Your tenant's secret API key. |
+| `Content-Type` | `application/json` | Request payload format. |
+
+## Request Body Properties
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `channel` | `string` | **Yes** | Delivery channel: `EMAIL`, `SMS`, `WEBHOOK`, `IN_APP`. |
+| `recipient` | `string` | **Yes** | Target recipient. For `EMAIL` it is an email address, `SMS` is a phone number (+1...), `WEBHOOK` is an HTTPS url, `IN_APP` is a user/recipient ID. |
+| `template` | `string` | No | Name of a configured Template. Optional if sending raw content instead. |
+| `subject` | `string` | No | Subject line (required for raw `EMAIL` dispatch if no template is chosen). |
+| `body` | `string` | No | Plaintext/HTML body (required for raw dispatches if no template is chosen). |
+| `data` | `object` | No | Key-value pairs to interpolate into templates (`{{ variable }}`). Default is `{}`. |
+| `priority` | `string` | No | Queue priority class: `HIGH`, `DEFAULT`, `BULK`. Default is `DEFAULT`. |
+
+---
+
+## Examples
+
+<CodeGroup>
+```bash Template-based Dispatch
+curl -X POST https://api.notifyflow.dev/v1/notify \
+  -H "x-api-key: nf_live_9a7b3c2d1e0f8c7b" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel": "EMAIL",
+    "recipient": "customer@example.com",
+    "template": "welcome_new_user",
+    "data": {
+      "name": "Alex",
+      "company": "Acme Corp"
+    },
+    "priority": "HIGH"
+  }'
+```
+
+```bash Raw Content Dispatch
+curl -X POST https://api.notifyflow.dev/v1/notify \
+  -H "x-api-key: nf_live_9a7b3c2d1e0f8c7b" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "channel": "EMAIL",
+    "recipient": "customer@example.com",
+    "subject": "Direct Alert Notification",
+    "body": "This is a direct notification bypass template configs."
+  }'
+```
+</CodeGroup>
+
+---
+
+## Responses
+
+### 202 Accepted (Success)
+The request has been parsed and pushed onto the Redis queue.
+
+```json
+{
+  "notificationId": "notif_01HX8A99B99E7F6B",
+  "status": "queued"
+}
+```
+
+### Common Error Codes
+| Status | Error Code | Description |
+|---|---|---|
+| `400` | `BAD_REQUEST` | Validation error (e.g. invalid email format, missing fields). |
+| `401` | `UNAUTHORIZED` | Invalid or missing `x-api-key` header. |
+| `422` | `NO_PROVIDER_CONFIGURED` | The requested channel has no configured provider credentials (e.g. no Resend key for `EMAIL`). |
+| `429` | `TOO_MANY_REQUESTS` | Per-tenant API rate limit exceeded (100 req/10s window). |
+| `500` | `INTERNAL_SERVER_ERROR` | Server-side pipeline error. |

@@ -1,0 +1,40 @@
+---
+title: "Dead-Letter Queue"
+description: "Review and re-queue permanently failed notification dispatches"
+---
+
+The **Dead-Letter Queue (DLQ)** serves as the safety net for notifications that could not be delivered after all retry attempts.
+
+## Why it Matters
+Rather than silently dropping failed notifications, Notifyflow quarantines them in the DLQ. This ensures you never lose critical customer communications. You can review the exact error, fix the root cause, and manually retry delivery.
+
+---
+
+## Viewing Failures
+1. Go to the **Dead-Letter Queue** tab in the sidebar.
+2. Browse through the cards. Each card displays the notification ID, channel, and target recipient.
+3. The **Last Attempt Error** block shows the raw error response from the provider gateway (e.g. `Invalid API Key`).
+
+---
+
+## Manual Retry
+Once you resolve the issue (such as updating an expired Resend key or verifying a domain):
+1. Click **Retry Dispatch** on the card.
+2. The dashboard makes a request to `/api/v1/notifications/:id/retry`.
+3. The notification is re-queued into BullMQ, clearing the dead-letter status and initiating a new delivery run.
+
+---
+
+## Common Failures and Solutions
+
+### 1. `NO_PROVIDER_CONFIGURED`
+* **Reason:** You attempted to send a notification over a channel (e.g. `EMAIL`) without saving API credentials.
+* **Fix:** Go to **Providers**, configure the required channel, and click **Retry**.
+
+### 2. `unverified sender domain`
+* **Reason:** Resend rejected the request because the domain in `fromEmail` has not been verified.
+* **Fix:** Verify your domain in your Resend dashboard, or update `fromEmail` to `onboarding@resend.dev` for sandbox testing.
+
+### 3. `Invalid API Key`
+* **Reason:** The provider API key was deactivated or copied incorrectly.
+* **Fix:** Generate a new key and update the provider settings in the dashboard.

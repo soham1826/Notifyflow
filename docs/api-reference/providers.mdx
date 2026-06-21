@@ -1,0 +1,80 @@
+---
+title: "Providers API"
+description: "Configure third-party delivery credentials (BYOK)"
+---
+
+Notifyflow does not act as an email sender or SMS carrier. Instead, you supply credentials for your own providers, giving you full control over delivery reputation and billing rates.
+
+## AES-256-GCM Secure Encryption
+All private keys submitted to the Providers endpoint are encrypted in transit and stored encrypted in the database using **AES-256-GCM** encryption. The encryption key is derived from the server's private `PROVIDER_ENCRYPTION_KEY`. Stored values are only decrypted in memory on workers during active worker dispatches.
+
+---
+
+## Endpoints
+
+### 1. List Provider Configs
+* **Method & Path:** `GET /api/v1/providers`
+* **Auth:** Bearer Token (Dashboard)
+
+Returns a list of all configured channels. API keys are returned in a masked format (e.g. `re_••••••1234`) to prevent exposing raw keys in the dashboard.
+
+### 2. Save Provider Config
+* **Method & Path:** `POST /api/v1/providers`
+* **Auth:** Bearer Token (Dashboard)
+
+Saves or updates provider credentials.
+
+```json Request Body (Email/Resend)
+{
+  "channel": "EMAIL",
+  "provider": "resend",
+  "apiKey": "re_bEvumzDo_K5QTGFNDi65r6t2NU9DPFzVn",
+  "config": {
+    "fromName": "Acme Alerts",
+    "fromEmail": "onboarding@resend.dev"
+  }
+}
+```
+
+### 3. Test Connection
+* **Method & Path:** `POST /api/v1/providers/:channel/test`
+* **Auth:** Bearer Token (Dashboard)
+
+Instantiates the channel service in-memory and triggers a test dispatch bypass queueing pipelines.
+
+```json Response
+{
+  "success": true
+}
+```
+
+### 4. Delete Provider Config
+* **Method & Path:** `DELETE /api/v1/providers/:channel`
+* **Auth:** Bearer Token (Dashboard)
+
+---
+
+## Resend Integration Walkthrough
+
+Follow these steps to set up Resend as your email provider:
+
+<Steps>
+  <Step title="Generate Resend API Key">
+    Log into your [Resend account](https://resend.com), navigate to **API Keys**, and generate a new key.
+  </Step>
+
+  <Step title="Verify Your Domain (Recommended)">
+    By default, unverified free accounts can only send from `onboarding@resend.dev` and can only send to the email address that registered the account. To send to arbitrary recipients, navigate to **Domains** on Resend and verify your custom domain.
+  </Step>
+
+  <Step title="Configure on Notifyflow">
+    Under **Providers** in the dashboard, select **Email Delivery** -> **Resend** and save your key:
+    * `apiKey`: your Resend API Key.
+    * `fromEmail`: set to `alerts@yourdomain.com` (must be a subdomain or domain verified in Resend) or `onboarding@resend.dev` if testing in sandbox mode.
+    * `fromName`: name shown on emails (e.g., `Acme Corp`).
+  </Step>
+
+  <Step title="Run a Connection Test">
+    Click the **Play** icon to test the connection. This immediately delivers a test email to your registered account email.
+  </Step>
+</Steps>

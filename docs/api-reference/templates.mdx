@@ -1,0 +1,93 @@
+---
+title: "Templates API"
+description: "Manage message templates programmatically"
+---
+
+Templates let you define structural mockups with placeholders, decoupling the copy content from your code.
+
+## Variable Syntax
+Notifyflow uses Mustache-style double curly brackets for variable interpolation:
+`{{ variableName }}`
+
+During ingestion, the values provided in the `data` payload replace matching brackets. If a key is missing, the bracket compiles as an empty string.
+
+---
+
+## Endpoints
+
+### 1. List Templates
+* **Method & Path:** `GET /api/v1/templates`
+* **Auth:** Bearer Token (Dashboard)
+
+```bash Response Example
+[
+  {
+    "id": "tpl_8cd2f9c114c1a654",
+    "name": "welcome_email",
+    "channel": "EMAIL",
+    "subject": "Welcome on board, {{ name }}!",
+    "body": "Hi {{ name }}, thanks for signing up to {{ company }}!",
+    "createdAt": "2026-06-21T04:00:00.000Z"
+  }
+]
+```
+
+### 2. Create Template
+* **Method & Path:** `POST /api/v1/templates`
+* **Auth:** Bearer Token (Dashboard)
+
+```json Request Body
+{
+  "name": "order_confirmed",
+  "channel": "EMAIL",
+  "subject": "Your Order #{{ orderId }} Has Shipped!",
+  "body": "Hi {{ customerName }},\n\nYour invoice amount of {{ price }} was processed. Tracking reference: {{ tracking }}."
+}
+```
+
+### 3. Update Template
+* **Method & Path:** `PUT /api/v1/templates/:id`
+* **Auth:** Bearer Token (Dashboard)
+
+```json Request Body
+{
+  "name": "order_confirmed",
+  "channel": "EMAIL",
+  "subject": "Your Order #{{ orderId }} Has Shipped!",
+  "body": "Hi {{ customerName }},\n\nYour invoice amount of {{ price }} was processed. Tracking reference: {{ tracking }}. Delivery address: {{ address }}."
+}
+```
+
+### 4. Delete Template
+* **Method & Path:** `DELETE /api/v1/templates/:id`
+* **Auth:** Bearer Token (Dashboard)
+
+---
+
+## Examples
+
+### Welcome Email template
+* **Subject:** `Welcome to {{ company }}, {{ name }}!`
+* **Body:**
+```html
+Hi {{ name }},
+
+Welcome to the family! We have set up your workspace at {{ domain }}. 
+To learn more, read the guidelines at {{ docsUrl }}.
+
+Cheers,
+The {{ company }} team
+```
+
+### Order Confirmation template
+* **Subject:** `Order Confirmed - #{{ orderId }}`
+* **Body:**
+```html
+Hi {{ name }},
+
+Thank you for your purchase. We are preparing items for dispatch:
+* Order ID: {{ orderId }}
+* Total: {{ amount }}
+
+A webhook confirmation will be triggered shortly.
+```

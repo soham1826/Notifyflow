@@ -1,0 +1,60 @@
+---
+title: "Quickstart"
+description: "Send your first notification in under 10 minutes"
+---
+
+Follow this guide to sign up, configure a channel provider, design a template, and dispatch your first notification.
+
+<Steps>
+  <Step title="Create your Account">
+    Sign up on the [Notifyflow Dashboard](https://notifyflow.dev/auth/signup) to create a tenant profile. Your new profile automatically initializes with a unique public API key.
+  </Step>
+  
+  <Step title="Configure your Resend API Key">
+    Navigate to the **Providers** section in the sidebar. Click **Configure** under **Email Delivery**, select **Resend**, and paste your Resend API Key.
+    
+    <Note>
+      Resend provides free API keys on registration. Ensure you configure a valid `fromEmail` matching your verified domain to send to any recipient address.
+    </Note>
+  </Step>
+
+  <Step title="Create a Template">
+    Navigate to the **Template Manager** in the sidebar. Click **New Template** and create a template with the following details:
+    * **Name:** `welcome_onboarding`
+    * **Channel:** `EMAIL`
+    * **Email Subject:** `Welcome {{ name }} to Acme Corp!`
+    * **Message Body:** `Hi {{ name }}, we are thrilled to welcome you to the team. Let us know if you need anything!`
+  </Step>
+
+  <Step title="Dispatch via cURL">
+    Use the cURL snippet below to trigger a post request, replacing `nf_live_xxxxxxxxxxxx` with your public API key (available in **Settings**):
+
+    ```bash
+    curl -X POST https://api.notifyflow.dev/v1/notify \
+      -H "Content-Type: application/json" \
+      -H "x-api-key: nf_live_9a7b3c2d1e0f8c7b" \
+      -d '{
+        "channel": "EMAIL",
+        "recipient": "customer@example.com",
+        "template": "welcome_onboarding",
+        "data": {
+          "name": "Sarah Jones"
+        }
+      }'
+    ```
+  </Step>
+
+  <Step title="Inspect in the Dashboard">
+    Head back to the **Overview** dashboard page. You will see the counter increment, and the notification logs list will display the new row matching your request. Tap the log card to view delivery attempts.
+  </Step>
+</Steps>
+
+## Ingestion Response
+A successful submission yields an HTTP `202 Accepted` response acknowledging the pipeline has ingested the request:
+
+```json
+{
+  "notificationId": "notif_01HX8A99B99E7F6B",
+  "status": "queued"
+}
+```

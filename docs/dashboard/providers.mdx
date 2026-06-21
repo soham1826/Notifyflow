@@ -1,0 +1,35 @@
+---
+title: "Dashboard Providers"
+description: "Manage dynamic carrier keys and credentials"
+---
+
+The **BYOK Providers** panel lets you configure credentials for email and SMS delivery.
+
+## Configuration Steps
+1. Navigate to the **Providers** section.
+2. Select your channel card and click **Configure**.
+3. Select your provider type.
+4. Input your secret API credentials.
+5. Save the configuration. Your key is immediately encrypted and saved securely.
+
+---
+
+## Connection Testing
+After configuring a provider, click the **Play** (Test Connection) icon on the card:
+* This instantiates the provider service.
+* It sends a test notification to your tenant email (for `EMAIL`) or a test payload.
+* It reports success or failure directly in the dashboard, helping you verify credentials before routing live traffic.
+
+---
+
+## 422 Guardrail Responses
+To protect your queues, the Notifyflow ingestion endpoint checks for active providers on request ingestion. If a client attempts a `POST /v1/notify` call on a channel that has no active provider config, the server rejects the request with a **422 Unprocessable Entity** response containing:
+
+```json
+{
+  "error": "Unprocessable Entity",
+  "message": "No provider config found for channel EMAIL. Please configure and save a provider first."
+}
+```
+
+This prevents jobs from getting stuck in retry loops.

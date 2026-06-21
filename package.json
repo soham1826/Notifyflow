@@ -1,0 +1,22 @@
+{
+  "name": "notifyflow",
+  "version": "1.0.0",
+  "description": "Multi-tenant notification delivery platform",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev --workspace=apps/api",
+    "dev:dashboard": "npm run dev --workspace=apps/dashboard",
+    "build": "npm run build --workspace=@notifyflow/shared && npm run build --workspace=@notifyflow/db && npm run build --workspace=@notifyflow/api && npm run build --workspace=@notifyflow/dashboard",
+    "start:api": "npm run start --workspace=apps/api",
+    "start:worker": "npm run worker --workspace=apps/api",
+    "db:migrate": "npx prisma migrate dev --schema=packages/db/prisma/schema.prisma",
+    "db:generate": "npx prisma generate --schema=packages/db/prisma/schema.prisma"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}

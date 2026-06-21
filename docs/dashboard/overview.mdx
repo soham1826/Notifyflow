@@ -1,0 +1,29 @@
+---
+title: "Dashboard Overview"
+description: "Walkthrough of your real-time notification control center"
+---
+
+The Notifyflow Dashboard serves as the command center for monitoring all delivery activity and configuring your notification pipelines.
+
+## Stats Cards
+The header of the overview screen displays four main aggregates:
+* **Total Dispatched:** All notification requests processed.
+* **Delivery Rate:** The percentage of attempts returning a successful delivery status.
+* **In-Flight Queue:** Active jobs currently processing or retrying in BullMQ.
+* **Dead-Letter Entries:** The count of permanently failed notification events.
+
+---
+
+## Range Selector
+Toggle between two time filters:
+* **All-Time:** Aggregated totals across all recorded history.
+* **Today (UTC):** Focuses on dispatches that occurred since 00:00 UTC today.
+
+---
+
+## Live Activity Stream
+The right panel displays a live SSE (Server-Sent Events) feed. When workers change notification states, the updates stream directly into this panel in real time, showing:
+* **Channel:** The delivery channel (e.g. `EMAIL`).
+* **Recipient:** Truncated target identifier.
+* **Status Badge:** Semantic colors representing state (`DELIVERED` green, `RETRYING` amber, `FAILED` red).
+* **Timestamp:** Exact dispatch time.

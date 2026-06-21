@@ -1,0 +1,40 @@
+---
+title: "Dashboard Templates"
+description: "Design and customize templates for delivery"
+---
+
+The **Template Manager** lets you manage the structure and content of your notifications.
+
+## Creating a Template
+1. Click **New Template** in the top right.
+2. Provide a **Template Name** (use snake_case, e.g. `welcome_email_customer`).
+3. Select the **Delivery Channel** (`EMAIL`, `SMS`, `WEBHOOK`, `IN_APP`).
+4. Enter the **Email Subject** (for `EMAIL` only).
+5. Compose your **Message Body**.
+
+---
+
+## Variable Syntax
+Use double curly brackets to define dynamic variables:
+`{{ name }}`
+
+When dispatching, the `data` object properties will replace matching variables:
+
+```json Data Payload
+{
+  "name": "Sarah",
+  "company": "Acme Corp"
+}
+```
+
+```html Compiled Output
+Hi Sarah, welcome on board at Acme Corp!
+```
+
+---
+
+## Channel Specifications
+* **EMAIL:** Requires an **Email Subject**. Supports HTML markup in the message body.
+* **SMS:** Subject is ignored. Body should be plain text and kept under 160 characters to prevent carrier segmentation.
+* **WEBHOOK:** Body is typically a JSON structure containing endpoints and keys.
+* **IN_APP:** Body contains the persistent content rendered in the customer-facing feed.

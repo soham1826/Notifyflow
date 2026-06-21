@@ -1,0 +1,64 @@
+---
+title: "Webhook Channel"
+description: "Ingest real-time updates using secure webhook signatures"
+---
+
+The `WEBHOOK` channel triggers an HTTP `POST` request to the target HTTPS URL configured in the `recipient` field.
+
+## Secure Request Verification
+To prevent spoofing or unauthorized posts, every webhook payload is signed with a cryptographic signature sent in the request header:
+`x-notifyflow-signature`
+
+This header contains an HMAC-SHA256 signature generated using a shared Webhook signing secret. You can set this secret in the **Settings** tab.
+
+---
+
+## Verifying Webhook Signatures
+
+To verify that the webhook request came from Notifyflow, compute the HMAC-SHA256 hash of the raw request body string using your shared secret, and compare it to the signature header.
+
+<CodeGroup>
+```javascript Node.js Verification
+import crypto from "crypto";
+
+export function verifySignature(req, res, next) {
+  const signature = req.headers["x-notifyflow-signature"];
+  const rawBody = JSON.stringify(req.body);
+  const secret = process.env.NOTIFYFLOW_WEBHOOK_SECRET;
+
+  const hash = crypto
+    .createHmac("sha256", secret)
+    .update(rawBody)
+    .digest("hex");
+
+  if (signature === hash) {
+    next();
+  } else {
+    res.status(401).send("Invalid signature header");
+  }
+}
+```
+
+```python Python Verification
+import hmac
+import hashlib
+
+def verify_signature(raw_body_bytes, signature_header, secret):
+    # Secret must be key bytes
+    secret_bytes = secret.encode('utf-8')
+    computed_signature = hmac.new(
+        secret_bytes, 
+        raw_body_bytes, 
+        hashlib.sha256
+    ).hexdigest()
+    
+    return hmac.compare_digest(computed_signature, signature_header)
+```
+</CodeGroup>
+
+---
+
+## Retries and Timeouts
+* **Connection Timeout:** Webhook workers enforce a **5-second** response window. If the target server fails to reply within 5 seconds, the request is considered a failure.
+* **HTTP Failure States:** Any status code outside the `2xx` range (such as `500 Internal Error` or `404 Not Found`) is treated as a delivery failure.
+* **Retry Loop:** Webhook failures undergo 4 automatic retries using exponential backoff before being marked as dead-letter events.

@@ -1,0 +1,140 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Channel {
+  EMAIL
+  WEBHOOK
+  IN_APP
+  SMS
+}
+
+enum Priority {
+  HIGH
+  DEFAULT
+  BULK
+}
+
+enum NotificationStatus {
+  QUEUED
+  PROCESSING
+  RETRYING
+  DELIVERED
+  FAILED
+}
+
+enum AttemptStatus {
+  DELIVERED
+  FAILED
+}
+
+model Tenant {
+  id             String        @id @default(uuid())
+  name           String
+  email          String        @unique
+  passwordHash   String?       @map("password_hash")
+  supabaseUserId String?       @unique @map("supabase_user_id")
+  apiKey         String        @unique @map("api_key")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  
+  templates    Template[]
+  notifications Notification[]
+  inAppNotifications InAppNotification[]
+  providerConfigs ProviderConfig[]
+
+  @@map("tenants")
+}
+
+model Template {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  name      String
+  channel   Channel
+  subject   String?
+  body      String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  notifications Notification[]
+
+  @@unique([tenantId, name])
+  @@map("templates")
+}
+
+model Notification {
+  id          String             @id @default(uuid())
+  tenantId    String             @map("tenant_id")
+  channel     Channel
+  recipient   String
+  templateId  String?            @map("template_id")
+  rawSubject  String?            @map("raw_subject")
+  rawBody     String?            @map("raw_body") @db.Text
+  data        Json               @default("{}")
+  priority    Priority           @default(DEFAULT)
+  status      NotificationStatus @default(QUEUED)
+  createdAt   DateTime           @default(now()) @map("created_at")
+  updatedAt   DateTime           @updatedAt @map("updated_at")
+  deliveredAt DateTime?          @map("delivered_at")
+
+  tenant      Tenant             @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  template    Template?          @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  attempts    DeliveryAttempt[]
+
+  @@index([tenantId])
+  @@index([status])
+  @@map("notifications")
+}
+
+model DeliveryAttempt {
+  id             String        @id @default(uuid())
+  notificationId String        @map("notification_id")
+  attemptNumber  Int           @map("attempt_number")
+  status         AttemptStatus
+  error          String?       @db.Text
+  attemptedAt    DateTime      @default(now()) @map("attempted_at")
+
+  notification   Notification  @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+  @@map("delivery_attempts")
+}
+
+model InAppNotification {
+  id          String   @id @default(uuid())
+  tenantId    String   @map("tenant_id")
+  recipientId String   @map("recipient_id")
+  title       String
+  body        String   @db.Text
+  read        Boolean  @default(false)
+  createdAt   DateTime @default(now()) @map("created_at")
+  readAt      DateTime? @map("read_at")
+
+  tenant      Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, recipientId])
+  @@map("inapp_notifications")
+}
+
+model ProviderConfig {
+  id        String   @id @default(uuid())
+  tenantId  String   @map("tenant_id")
+  channel   Channel
+  provider  String
+  apiKey    String   @map("api_key")
+  config    Json     @default("{}")
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  tenant    Tenant   @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, channel])
+  @@map("provider_configs")
+}

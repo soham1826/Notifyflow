@@ -1,0 +1,126 @@
+---
+title: "In-App API"
+description: "Ingest and manage notifications to show in-app"
+---
+
+The `IN_APP` channel stores notification records directly in the database, allowing you to build persistent notification bells or feed panels inside your customer dashboards.
+
+## How it Works
+Unlike Email or SMS, In-App dispatches do not hit external third-party servers. When you send a notification with `channel: "IN_APP"`, the worker writes a record to the `inapp_notifications` database table. Your client applications can then read from these records.
+
+---
+
+## Database Queries
+
+Since in-app feeds write directly to Postgres, you can query items using raw SQL or by querying the database repository.
+
+### Fetch Unread Feed
+Get the list of unread alerts for a specific user recipient:
+
+```sql
+SELECT id, title, body, created_at 
+FROM inapp_notifications 
+WHERE tenant_id = 'your-tenant-id' 
+  AND recipient_id = 'user-12345' 
+  AND read = false 
+ORDER BY created_at DESC;
+```
+
+### Mark as Read
+Flag a notification as read when the user views the panel or opens the alert:
+
+```sql
+UPDATE inapp_notifications 
+SET read = true, read_at = NOW() 
+WHERE id = 'notif-uuid-here';
+```
+
+---
+
+## React Component Example
+Here is a complete, responsive React hook example showing how to build an active Notification Bell panel that polls for unread alerts:
+
+```tsx
+import React, { useState, useEffect } from "react";
+import { Bell } from "lucide-react";
+
+interface Notification {
+  id: string;
+  title: string;
+  body: string;
+  createdAt: string;
+}
+
+export function NotificationBell({ userId, tenantId }: { userId: string, tenantId: string }) {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Fetch unread notifications
+  const fetchFeed = async () => {
+    try {
+      const res = await fetch(`/api/v1/inapp/${tenantId}/${userId}/unread`);
+      if (res.ok) {
+        const data = await res.json();
+        setNotifications(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch notification feed", e);
+    }
+  };
+
+  useEffect(() => {
+    fetchFeed();
+    const interval = setInterval(fetchFeed, 15000); // Poll every 15s
+    return () => clearInterval(interval);
+  }, [userId, tenantId]);
+
+  // Mark an item as read
+  const handleMarkAsRead = async (id: string) => {
+    try {
+      const res = await fetch(`/api/v1/inapp/${id}/read`, { method: "POST" });
+      if (res.ok) {
+        setNotifications((prev) => prev.filter((n) => n.id !== id));
+      }
+    } catch (e) {
+      console.error("Failed to mark as read", e);
+    }
+  };
+
+  return (
+    <div className="relative">
+      <button onClick={() => setIsOpen(!isOpen)} className="relative p-2 rounded hover:bg-gray-100">
+        <Bell className="h-6 w-6 text-gray-700" />
+        {notifications.length > 0 && (
+          <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[10px] font-bold text-white">
+            {notifications.length}
+          </span>
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-80 rounded-xl border border-gray-100 bg-white shadow-lg p-4 space-y-3 z-50">
+          <h4 className="font-bold text-sm text-gray-800 border-b pb-2">Notifications Feed</h4>
+          <div className="max-h-60 overflow-y-auto space-y-2">
+            {notifications.length > 0 ? (
+              notifications.map((n) => (
+                <div key={n.id} className="p-2.5 rounded bg-gray-50 text-xs space-y-1">
+                  <h5 className="font-semibold text-gray-800">{n.title}</h5>
+                  <p className="text-gray-600">{n.body}</p>
+                  <button
+                    onClick={() => handleMarkAsRead(n.id)}
+                    className="text-rose-600 font-bold hover:underline text-[10px] block mt-1"
+                  >
+                    Mark as read
+                  </button>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500 text-xs text-center py-6">All caught up!</p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```

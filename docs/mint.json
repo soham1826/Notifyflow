@@ -1,0 +1,61 @@
+{
+  "name": "Notifyflow",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#E11D48",
+    "light": "#FB7185",
+    "dark": "#BE123C"
+  },
+  "topbarLinks": [
+    { "name": "Dashboard", "url": "https://notifyflow.dev/dashboard" }
+  ],
+  "topbarCtaButton": {
+    "name": "Get Started",
+    "url": "https://notifyflow.dev/auth/signup"
+  },
+  "navigation": [
+    {
+      "group": "Getting Started",
+      "pages": [
+        "introduction",
+        "quickstart",
+        "concepts"
+      ]
+    },
+    {
+      "group": "API Reference",
+      "pages": [
+        "api-reference/authentication",
+        "api-reference/send-notification",
+        "api-reference/templates",
+        "api-reference/providers",
+        "api-reference/inapp"
+      ]
+    },
+    {
+      "group": "Channels",
+      "pages": [
+        "channels/email",
+        "channels/webhook",
+        "channels/inapp",
+        "channels/sms"
+      ]
+    },
+    {
+      "group": "Dashboard",
+      "pages": [
+        "dashboard/overview",
+        "dashboard/dead-letter-queue",
+        "dashboard/templates",
+        "dashboard/providers"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/yourusername/notifyflow"
+  }
+}
