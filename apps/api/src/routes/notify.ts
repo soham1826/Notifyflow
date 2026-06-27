@@ -37,6 +37,20 @@ router.post(
         priority,
       } = parsed.data;
 
+      // Hard cap: 10,000 notifications per tenant (demo platform limit)
+      const notificationCount = await prisma.notification.count({
+        where: { tenantId: tenant.id }
+      })
+
+      if (notificationCount >= 10000) {
+        return res.status(429).json({
+          error: 'Notification limit reached. This demo platform has a 10,000 notification limit per tenant. Please contact us to discuss production use.',
+          code: 'NOTIFICATION_LIMIT_REACHED',
+          limit: 10000,
+          current: notificationCount
+        })
+      }
+
       let templateId: string | null = null;
 
       // 1. Resolve template name if provided
@@ -122,6 +136,110 @@ router.post(
     } catch (error) {
       console.error("Notify endpoint error:", error);
       return res.status(500).json({ error: "Internal server error queuing notification" });
+    }
+  }
+);
+
+/**
+ * GET /api/v1/notify/inapp/:recipientId
+ * Returns last 5 in-app notifications for the recipient, authenticated by x-api-key.
+ */
+router.get(
+  "/inapp/:recipientId",
+  authenticateApiKey,
+  async (req: Request, res: Response) => {
+    try {
+      const tenant = req.tenant!;
+      const { recipientId } = req.params;
+
+      const notifications = await prisma.inAppNotification.findMany({
+        where: {
+          tenantId: tenant.id,
+          recipientId,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        take: 5,
+      });
+
+      return res.status(200).json({ notifications });
+    } catch (error) {
+      console.error("Fetch inapp notifications error:", error);
+      return res.status(500).json({ error: "Internal server error fetching in-app notifications" });
+    }
+  }
+);
+
+/**
+ * POST /api/v1/notify/inapp/:recipientId/read
+ * Marks all unread in-app notifications for the recipient as read.
+ */
+router.post(
+  "/inapp/:recipientId/read",
+  authenticateApiKey,
+  async (req: Request, res: Response) => {
+    try {
+      const tenant = req.tenant!;
+      const { recipientId } = req.params;
+
+      await prisma.inAppNotification.updateMany({
+        where: {
+          tenantId: tenant.id,
+          recipientId,
+          read: false,
+        },
+        data: {
+          read: true,
+          readAt: new Date(),
+        },
+      });
+
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      console.error("Mark inapp notifications read error:", error);
+      return res.status(500).json({ error: "Internal server error marking in-app notifications as read" });
+    }
+  }
+);
+
+/**
+ * GET /api/v1/notify/:id
+ * Returns the status, channel, recipient, and details of a single notification.
+ * Authenticated by x-api-key.
+ */
+router.get(
+  "/:id",
+  authenticateApiKey,
+  async (req: Request, res: Response) => {
+    try {
+      const tenant = req.tenant!;
+      const { id } = req.params;
+
+      const notification = await prisma.notification.findUnique({
+        where: {
+          id,
+          tenantId: tenant.id,
+        },
+        include: {
+          attempts: {
+            orderBy: { attemptNumber: "desc" },
+            take: 1,
+            select: {
+              error: true,
+            },
+          },
+        },
+      });
+
+      if (!notification) {
+        return res.status(404).json({ error: "Notification not found" });
+      }
+
+      return res.status(200).json({ notification });
+    } catch (error) {
+      console.error("Fetch single notification error:", error);
+      return res.status(500).json({ error: "Internal server error fetching notification" });
     }
   }
 );

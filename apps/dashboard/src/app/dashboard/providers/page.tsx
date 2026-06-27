@@ -158,6 +158,7 @@ export default function ProvidersPage() {
       description: "Send transactional and lifecycle emails using your own Resend API key. Requires a verified sending domain on Resend for delivery to arbitrary recipients.",
       icon: Globe,
       allowedProviders: ["resend"],
+      comingSoon: false,
     },
     {
       id: "SMS" as const,
@@ -165,6 +166,7 @@ export default function ProvidersPage() {
       description: "Transmit text messages to mobile phone lines globally using Twilio or a compatible SMS gateway. Enter your Twilio Auth Token as the API Key.",
       icon: Shield,
       allowedProviders: ["twilio", "mock"],
+      comingSoon: true,
     },
   ];
 
@@ -251,7 +253,11 @@ export default function ProvidersPage() {
                   </div>
 
                   {/* Status Badge */}
-                  {config && config.enabled ? (
+                  {info.comingSoon ? (
+                    <span className="inline-flex items-center gap-1 rounded bg-amber-50 px-2.5 py-0.5 text-[9px] font-bold text-amber-700 border border-amber-200">
+                      Coming Soon
+                    </span>
+                  ) : config && config.enabled ? (
                     <span className="inline-flex items-center gap-1 rounded bg-[#DCFCE7] px-2.5 py-0.5 text-[9px] font-bold text-[#15803D] border border-[#DCFCE7]">
                       <span className="h-1.5 w-1.5 rounded-full bg-[#15803D]" />
                       Configured
@@ -269,7 +275,7 @@ export default function ProvidersPage() {
                 </p>
 
                 {/* Configuration details if present */}
-                {config && (
+                {!info.comingSoon && config && (
                   <div className="rounded-lg bg-[#FAF9F7] border border-[#F1EDE9] p-3.5 space-y-2 text-xs font-mono">
                     <div className="flex justify-between">
                       <span className="text-[#78716C]">Provider:</span>
@@ -301,31 +307,42 @@ export default function ProvidersPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-[#F1EDE9]">
-                <button
-                  onClick={() => handleOpenConfigure(info.id)}
-                  className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#F1EDE9] bg-[#FAF9F7] hover:bg-[#F1EDE9] text-[#1C1917] hover:text-[#1C1917] px-3 py-2.5 text-xs font-semibold transition-colors outline-none min-h-[44px]"
-                >
-                  <Edit3 className="h-4 w-4" />
-                  {config ? "Modify" : "Configure"}
-                </button>
-
-                {config && (
+                {info.comingSoon ? (
+                  <button
+                    disabled
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#E5E7EB] bg-gray-50 text-gray-400 px-3 py-2.5 text-xs font-semibold cursor-not-allowed min-h-[44px]"
+                  >
+                    Coming Soon
+                  </button>
+                ) : (
                   <>
                     <button
-                      onClick={() => handleTestConnection(info.id)}
-                      disabled={testingChannel === info.id}
-                      className="flex items-center justify-center rounded-lg border border-[#F1EDE9] bg-[#FAF9F7] hover:bg-[#F1EDE9] text-[#78716C] hover:text-[#1C1917] p-2.5 text-xs font-semibold transition-colors outline-none disabled:opacity-50 min-w-[44px] min-h-[44px]"
-                      title="Test Connection"
+                      onClick={() => handleOpenConfigure(info.id)}
+                      className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-[#F1EDE9] bg-[#FAF9F7] hover:bg-[#F1EDE9] text-[#1C1917] hover:text-[#1C1917] px-3 py-2.5 text-xs font-semibold transition-colors outline-none min-h-[44px]"
                     >
-                      <Play className={`h-4 w-4 ${testingChannel === info.id ? "animate-pulse text-[#E11D48]" : ""}`} />
+                      <Edit3 className="h-4 w-4" />
+                      {config ? "Modify" : "Configure"}
                     </button>
-                    <button
-                      onClick={() => handleDelete(info.id)}
-                      className="flex items-center justify-center rounded-lg border border-[#FFF1F2] bg-[#FFF1F2] hover:bg-[#FFF1F2] text-[#BE123C] p-2.5 text-xs font-semibold transition-colors outline-none min-w-[44px] min-h-[44px]"
-                      title="Remove Configuration"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+
+                    {config && (
+                      <>
+                        <button
+                          onClick={() => handleTestConnection(info.id)}
+                          disabled={testingChannel === info.id}
+                          className="flex items-center justify-center rounded-lg border border-[#F1EDE9] bg-[#FAF9F7] hover:bg-[#F1EDE9] text-[#78716C] hover:text-[#1C1917] p-2.5 text-xs font-semibold transition-colors outline-none disabled:opacity-50 min-w-[44px] min-h-[44px]"
+                          title="Test Connection"
+                        >
+                          <Play className={`h-4 w-4 ${testingChannel === info.id ? "animate-pulse text-[#E11D48]" : ""}`} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(info.id)}
+                          className="flex items-center justify-center rounded-lg border border-[#FFF1F2] bg-[#FFF1F2] hover:bg-[#FFF1F2] text-[#BE123C] p-2.5 text-xs font-semibold transition-colors outline-none min-w-[44px] min-h-[44px]"
+                          title="Remove Configuration"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </>
+                    )}
                   </>
                 )}
               </div>

@@ -62,3 +62,34 @@ def verify_signature(raw_body_bytes, signature_header, secret):
 * **Connection Timeout:** Webhook workers enforce a **5-second** response window. If the target server fails to reply within 5 seconds, the request is considered a failure.
 * **HTTP Failure States:** Any status code outside the `2xx` range (such as `500 Internal Error` or `404 Not Found`) is treated as a delivery failure.
 * **Retry Loop:** Webhook failures undergo 4 automatic retries using exponential backoff before being marked as dead-letter events.
+
+---
+
+## Developer Implementation
+
+To dispatch webhook events, configure your recipient as the destination webhook listener URL, and pass the event payload in the `data` parameter:
+
+```typescript
+const response = await fetch("https://notifyflow-api.onrender.com/api/v1/notify", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": process.env.NOTIFYFLOW_API_KEY
+  },
+  body: JSON.stringify({
+    channel: "WEBHOOK",
+    recipient: "https://yourdomain.com/webhooks/listener", // Endpoint URL
+    rawBody: "Order placed event payload",
+    data: {
+      event: "order.placed",
+      orderId: "ORD-1029",
+      amount: 4499,
+      timestamp: Date.now()
+    },
+    priority: "DEFAULT"
+  })
+});
+
+const data = await response.json();
+console.log("Ingested Webhook ID:", data.notificationId);
+```

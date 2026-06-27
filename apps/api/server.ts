@@ -56,6 +56,14 @@ app.use("/api/v1/notifications", notificationsRouter);
 app.use("/api/v1/templates", templatesRouter);
 app.use("/api/v1/providers", providersRouter);
 
+// Block /admin/* in production regardless of NODE_ENV check
+app.use('/admin', (req, res, next) => {
+  if (process.env.NODE_ENV === 'production') {
+    return res.status(404).json({ error: 'Not found' })
+  }
+  next()
+})
+
 // Mount Bull Board dashboard conditionally in development environment
 if (process.env.NODE_ENV !== "production") {
   // Use dynamic imports to prevent startup crashes when dev dependencies are not installed in production

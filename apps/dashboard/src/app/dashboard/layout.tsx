@@ -220,9 +220,41 @@ export default function DashboardLayout({
   );
 
   return (
-    <div className="flex min-h-screen bg-[#FAF9F7] font-sans text-[#1C1917]">
+    <div 
+      className="flex min-h-screen bg-[#FAF9F7] font-sans text-[#1C1917]"
+      style={{ paddingTop: "38px" }}
+    >
+      {/* Demo disclaimer banner */}
+      <div 
+        style={{ 
+          background: "#FFF7ED",
+          borderBottom: "1px solid #FED7AA",
+          height: "38px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "8px",
+          fontSize: "13px",
+          color: "#9A3412",
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100
+        }}
+      >
+        <span>⚠️</span>
+        <span>
+          This is a portfolio/demo platform. Do not use for production workloads. 
+          Abuse will result in account termination.
+        </span>
+      </div>
+
       {/* Sidebar for Desktop (1024px+) */}
-      <aside className="hidden lg:block lg:fixed lg:inset-y-0 lg:left-0 lg:w-60 lg:shrink-0 border-r border-[#F1EDE9] bg-white z-20">
+      <aside 
+        className="hidden lg:block lg:fixed lg:inset-y-0 lg:left-0 lg:w-60 lg:shrink-0 border-r border-[#F1EDE9] bg-white z-20"
+        style={{ top: "38px" }}
+      >
         {sidebarContent}
       </aside>
 
@@ -232,6 +264,7 @@ export default function DashboardLayout({
         {isSidebarOpen && (
           <div
             className="fixed inset-0 bg-[#1C1917]/30 z-40 transition-opacity duration-300"
+            style={{ top: "38px" }}
             onClick={() => setIsSidebarOpen(false)}
           />
         )}
@@ -241,6 +274,7 @@ export default function DashboardLayout({
           className={`fixed inset-y-0 left-0 w-60 border-r border-[#F1EDE9] bg-white z-50 transform transition-transform duration-300 ease-in-out ${
             isSidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
+          style={{ top: "38px" }}
         >
           {/* Close button inside drawer */}
           <div className="absolute top-4 right-4 z-50 lg:hidden">
@@ -259,7 +293,10 @@ export default function DashboardLayout({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 lg:pl-60">
         {/* Mobile Header Bar */}
-        <header className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-[#F1EDE9] flex items-center justify-between px-4 z-30">
+        <header 
+          className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white border-b border-[#F1EDE9] flex items-center justify-between px-4 z-30"
+          style={{ top: "38px" }}
+        >
           <button
             onClick={() => setIsSidebarOpen(true)}
             className="text-[#E11D48] hover:text-[#BE123C] p-2 rounded transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"

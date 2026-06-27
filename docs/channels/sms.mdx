@@ -24,3 +24,28 @@ Under **Providers** in the dashboard, configure the following keys:
 ## SMS Payload requirements
 * **Recipient Format:** The recipient field must contain a valid phone number in international E.164 format (e.g. `+15555555555`).
 * **Content Limits:** Avoid exceeding **160 characters** in your message body to prevent carriers from splitting your text into multiple billable segments.
+
+---
+
+## Developer Implementation
+
+To send text messages or OTP passcodes, trigger a notification with `channel: "SMS"`. Recipient addresses must be formatted in E.164 notation.
+
+```typescript
+const response = await fetch("https://notifyflow-api.onrender.com/api/v1/notify", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": process.env.NOTIFYFLOW_API_KEY
+  },
+  body: JSON.stringify({
+    channel: "SMS",
+    recipient: "+15555555555", // International format
+    rawBody: "Your Shopwave login verification code is 482910. Expires in 10 minutes.",
+    priority: "HIGH"
+  })
+});
+
+const data = await response.json();
+console.log("Ingested SMS ID:", data.notificationId);
+```

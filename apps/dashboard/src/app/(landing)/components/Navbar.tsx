@@ -22,10 +22,34 @@ export default function Navbar() {
 
   return (
     <>
+      {/* Demo banner — above navbar */}
+      <div 
+        style={{
+          background: '#FFF7ED',
+          borderBottom: '1px solid #FED7AA', 
+          padding: '6px 16px',
+          textAlign: 'center',
+          fontSize: '13px',
+          color: '#9A3412',
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 100,
+          height: '31px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        ⚠️ Portfolio/demo platform — not for production use
+      </div>
+
       <header
-        className={`fixed top-0 left-0 right-0 h-16 z-50 transition-all duration-200 select-none ${
+        className={`fixed left-0 right-0 h-16 z-50 transition-all duration-200 select-none ${
           isScrolled ? "bg-[#FAF9F7]/95 backdrop-blur-md border-b border-[#F1EDE9]" : "bg-transparent"
         }`}
+        style={{ top: '31px' }}
       >
         <div className="max-w-6xl mx-auto h-full px-6 flex items-center justify-between">
           {/* Logo */}
@@ -93,6 +117,7 @@ export default function Navbar() {
       {isMobileOpen && (
         <div
           className="fixed inset-0 bg-[#1C1917]/25 z-40 md:hidden"
+          style={{ top: '31px' }}
           onClick={() => setIsMobileOpen(false)}
         />
       )}
@@ -102,6 +127,7 @@ export default function Navbar() {
         className={`fixed inset-y-0 right-0 w-64 bg-[#FAF9F7] border-l border-[#F1EDE9] z-50 transform transition-transform duration-300 ease-in-out md:hidden flex flex-col justify-between p-6 select-none ${
           isMobileOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{ top: '31px' }}
       >
         <div className="space-y-6">
           <div className="flex items-center justify-between border-b border-[#F1EDE9] pb-4">

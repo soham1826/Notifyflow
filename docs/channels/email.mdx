@@ -37,3 +37,54 @@ The worker records all delivery metadata in the `delivery_attempts` table. If Re
 * `401 Unauthorized`: Your API Key is invalid or has expired/been rotated on Resend.
 * `422 Unprocessable Entity`: The recipient address has bounced repeatedly or is on Resend's suppressions list.
 * `422 validation`: The sender email domain is not verified.
+
+---
+
+## Developer Implementation
+
+Developers trigger email notifications by making an authenticated HTTP `POST` call to `/api/v1/notify`. You can request delivery using either a pre-configured template or a raw text payload.
+
+### Method 1: Using a Template
+
+```typescript
+const response = await fetch("https://notifyflow-api.onrender.com/api/v1/notify", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": process.env.NOTIFYFLOW_API_KEY // Kept server-side
+  },
+  body: JSON.stringify({
+    channel: "EMAIL",
+    recipient: "customer@example.com",
+    templateName: "order_confirmed", // Name of template in your dashboard
+    data: {
+      customerName: "Alex",
+      orderId: "ORD-9876",
+      amount: 2999
+    },
+    priority: "HIGH"
+  })
+});
+
+const data = await response.json();
+console.log("Ingested Notification ID:", data.notificationId);
+```
+
+### Method 2: Using Raw Subject and Body
+
+```typescript
+const response = await fetch("https://notifyflow-api.onrender.com/api/v1/notify", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "x-api-key": process.env.NOTIFYFLOW_API_KEY
+  },
+  body: JSON.stringify({
+    channel: "EMAIL",
+    recipient: "customer@example.com",
+    rawSubject: "System Alert",
+    rawBody: "Your server usage has exceeded 90%. Please review dashboard.",
+    priority: "DEFAULT"
+  })
+});
+```

@@ -4,7 +4,9 @@
   "description": "Multi-tenant notification delivery platform",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/api",
+    "apps/dashboard",
+    "apps/shopwave",
     "packages/*"
   ],
   "scripts": {
