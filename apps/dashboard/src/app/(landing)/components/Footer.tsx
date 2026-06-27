@@ -65,6 +65,19 @@ export default function Footer() {
             &copy; 2026 Notifyflow. Open source and free to use.
           </span>
           <a
+            href="https://github.com/soham1826"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center space-x-2 text-[#78716C] hover:text-[#1C1917] transition-colors font-semibold group"
+          >
+            <span>Built and Shipped by Soham Kulkarni</span>
+            <img 
+              src="/soham.jpg" 
+              alt="Soham Kulkarni" 
+              className="w-5 h-5 rounded-full object-cover border border-[#F1EDE9] group-hover:border-[#E11D48] transition-colors"
+            />
+          </a>
+          <a
             href="https://github.com/soham1826/Notifyflow"
             target="_blank"
             rel="noreferrer"
